@@ -1,6 +1,7 @@
 import 'package:control_panel/colors.dart';
 import 'package:control_panel/strings.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,7 +31,12 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: TalariaColors.maroon),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: TalariaColors.maroon,
+          brightness: Brightness.light,
+          contrastLevel: 1.0,
+        ),
+        fontFamily: GoogleFonts.gabarito().fontFamily,
         useMaterial3: true,
       ),
       home: const MyHomePage(title: TalariaStrings.teamName),
