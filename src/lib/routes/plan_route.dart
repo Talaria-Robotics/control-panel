@@ -48,32 +48,52 @@ class _PlanRouteState extends State<PlanRoute> {
       content = const Center(child: CircularProgressIndicator());
     }
     else {
-      final stopsView = ListView.builder(
-        itemCount: _stops.length,
-        itemBuilder: buildRow,
+      final stopRows = <TableRow>[];
+      for (var i = 0; i < _stops.length; i++) {
+        stopRows.add(buildRow(context, i));
+      }
+
+      final stopsView = Table(
+        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+        children: stopRows,
       );
 
-      final addRowButton = FilledButton(
+      final addRowButton = OutlinedButton(
         onPressed: newRow,
         child: const Text("Add Stop")
       );
+
+      final nextButton = [
+        const SizedBox(width: 8.0),
+        FilledButton(
+          onPressed: () {},
+          child: const Text("Next"),
+        )
+      ];
       
-      content = Stack(
-        alignment: Alignment.bottomRight,
-        children: [
-          stopsView,
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: addRowButton
-          ),
-        ],
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text(TalariaStrings.teamName),
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(8.0),
+          child: stopsView
+        ),
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            addRowButton,
+            if (_stops.isNotEmpty)
+              ...nextButton,
+          ],
+        ),
       );
     }
     
     return Material(child: content);
   }
 
-  Widget buildRow(BuildContext context, int index) {
+  TableRow buildRow(BuildContext context, int index) {
     final stop = _stops[index];
     
     final roomOptions = <DropdownMenuEntry<MailRouteRoom>>[];
@@ -112,14 +132,29 @@ class _PlanRouteState extends State<PlanRoute> {
       dropdownMenuEntries: binOptions,
     );
 
-    return ListTile(
-      leading: Text("Stop ${index + 1}"),
-      title: Row(
-        children: [
-          roomMenu,
-          binMenu
-        ]
-      )
+    const cellPadding = EdgeInsets.all(8.0);
+    return TableRow(
+      decoration: index % 2 == 0 ? BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        borderRadius: const BorderRadius.all(Radius.circular(4.0))
+      ) : null,
+      children: [
+        Padding(
+          padding: cellPadding,
+          child: Text(
+            "Stop ${index + 1}",
+            style: Theme.of(context).textTheme.labelLarge,
+          )
+        ),
+        Padding(
+          padding: cellPadding,
+          child: roomMenu
+        ),
+        Padding(
+          padding: cellPadding,
+          child: binMenu
+        )
+      ]
     );
   }
 }
