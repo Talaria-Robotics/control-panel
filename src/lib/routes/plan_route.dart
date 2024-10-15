@@ -48,26 +48,26 @@ class _PlanRouteState extends State<PlanRoute> {
       content = const Center(child: CircularProgressIndicator());
     }
     else {
-      newStop();
-
       final stopsView = ListView.builder(
         itemCount: _stops.length,
         itemBuilder: buildRow,
       );
-      // content = Padding(
-      //   padding: const EdgeInsets.all(8.0),
-      //   child: Column(
-      //     children: [
-      //       const Text(TalariaStrings.teamName),
-      //       FilledButton(
-      //         onPressed: newRow,
-      //         child: const Text("Add Stop")
-      //       ),
-      //       stopsView
-      //     ]
-      //   )
-      // );
-      content = stopsView;
+
+      final addRowButton = FilledButton(
+        onPressed: newRow,
+        child: const Text("Add Stop")
+      );
+      
+      content = Stack(
+        alignment: Alignment.bottomRight,
+        children: [
+          stopsView,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: addRowButton
+          ),
+        ],
+      );
     }
     
     return Material(child: content);
@@ -75,7 +75,6 @@ class _PlanRouteState extends State<PlanRoute> {
 
   Widget buildRow(BuildContext context, int index) {
     final stop = _stops[index];
-    final room = _route!.rooms.firstWhere((r) => r.id == stop.roomId);
     
     final roomOptions = <DropdownMenuEntry<MailRouteRoom>>[];
     for (final room in _route!.rooms) {
