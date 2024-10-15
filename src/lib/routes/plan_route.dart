@@ -1,3 +1,5 @@
+import 'package:control_panel/api/navigator_api.dart';
+import 'package:control_panel/api/navigator_models.dart';
 import 'package:flutter/material.dart';
 
 class PlanRoute extends StatefulWidget {
@@ -8,7 +10,7 @@ class PlanRoute extends StatefulWidget {
 }
 
 class _PlanRouteState extends State<PlanRoute> {
-  List<String>? _roomOptions;
+  Iterable<MailRouteRoom>? _rooms;
 
   @override
   void initState() {
@@ -17,32 +19,37 @@ class _PlanRouteState extends State<PlanRoute> {
   }
 
   Future<void> loadOptions() async {
+    final routeInfo = await NavigatorApi.instance.getPossibleRouteInfo();
     setState(() {
-
+      _rooms = routeInfo.rooms;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_roomOptions == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    late Widget content;
 
-    final dropdownOptions = <DropdownMenuEntry<String>>[];
-    for (final option in _roomOptions!) {
-      final dropdownOption = DropdownMenuEntry<String>(
-        value: option,
-        label: "Option $option",
+    if (_rooms == null) {
+      content = const CircularProgressIndicator();
+    }
+    else {
+      final dropdownOptions = <DropdownMenuEntry<MailRouteRoom>>[];
+      for (final room in _rooms!) {
+        final dropdownOption = DropdownMenuEntry(
+          value: room,
+          label: room.name,
+        );
+        dropdownOptions.add(dropdownOption);
+      }
+      content = DropdownMenu(
+        onSelected: (value) { print(value?.name ?? "{null}"); },
+        dropdownMenuEntries: dropdownOptions,
       );
-      dropdownOptions.add(dropdownOption);
     }
-
+    
     return Material(
       child: Center(
-        child: DropdownMenu<String>(
-          onSelected: (String? value) { print(value); },
-          dropdownMenuEntries: dropdownOptions,
-        )
+        child: content
       ),
     );
   }
