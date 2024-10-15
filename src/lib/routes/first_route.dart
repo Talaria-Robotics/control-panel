@@ -1,3 +1,4 @@
+import 'package:control_panel/routes/plan_route.dart';
 import 'package:flutter/material.dart';
 
 class FirstRoute extends StatelessWidget {
@@ -33,7 +34,10 @@ class FirstRoute extends StatelessWidget {
               ],
             ),
             FilledButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (_) => const PlanRoute()));
+              },
               child: const Text("Get Started")
             ),
           ],
