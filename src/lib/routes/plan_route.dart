@@ -1,5 +1,6 @@
 import 'package:control_panel/api/navigator_api.dart';
 import 'package:control_panel/api/navigator_models.dart';
+import 'package:control_panel/strings.dart';
 import 'package:flutter/material.dart';
 
 class PlanRoute extends StatefulWidget {
@@ -10,7 +11,8 @@ class PlanRoute extends StatefulWidget {
 }
 
 class _PlanRouteState extends State<PlanRoute> {
-  Iterable<MailRouteRoom>? _rooms;
+  PossibleMailRouteInfo? _route;
+  final List<MailRouteStop> _stops = [];
 
   @override
   void initState() {
@@ -21,36 +23,104 @@ class _PlanRouteState extends State<PlanRoute> {
   Future<void> loadOptions() async {
     final routeInfo = await NavigatorApi.instance.getPossibleRouteInfo();
     setState(() {
-      _rooms = routeInfo.rooms;
+      _route = routeInfo;
     });
+  }
+
+  void newRow() {
+    setState(() {
+      newStop();
+    });
+  }
+
+  void newStop() {
+    final newStop = MailRouteStop()
+      ..binNumber = _route!.bins.first.number
+      ..roomId = _route!.rooms.first.id;
+    _stops.add(newStop);
   }
 
   @override
   Widget build(BuildContext context) {
     late Widget content;
 
-    if (_rooms == null) {
-      content = const CircularProgressIndicator();
+    if (_route == null) {
+      content = const Center(child: CircularProgressIndicator());
     }
     else {
-      final dropdownOptions = <DropdownMenuEntry<MailRouteRoom>>[];
-      for (final room in _rooms!) {
-        final dropdownOption = DropdownMenuEntry(
-          value: room,
-          label: room.name,
-        );
-        dropdownOptions.add(dropdownOption);
-      }
-      content = DropdownMenu(
-        onSelected: (value) { print(value?.name ?? "{null}"); },
-        dropdownMenuEntries: dropdownOptions,
+      newStop();
+
+      final stopsView = ListView.builder(
+        itemCount: _stops.length,
+        itemBuilder: buildRow,
       );
+      // content = Padding(
+      //   padding: const EdgeInsets.all(8.0),
+      //   child: Column(
+      //     children: [
+      //       const Text(TalariaStrings.teamName),
+      //       FilledButton(
+      //         onPressed: newRow,
+      //         child: const Text("Add Stop")
+      //       ),
+      //       stopsView
+      //     ]
+      //   )
+      // );
+      content = stopsView;
     }
     
-    return Material(
-      child: Center(
-        child: content
-      ),
+    return Material(child: content);
+  }
+
+  Widget buildRow(BuildContext context, int index) {
+    final stop = _stops[index];
+    final room = _route!.rooms.firstWhere((r) => r.id == stop.roomId);
+    
+    final roomOptions = <DropdownMenuEntry<MailRouteRoom>>[];
+    for (final room in _route!.rooms) {
+      final dropdownOption = DropdownMenuEntry(
+        value: room,
+        label: room.name,
+      );
+      roomOptions.add(dropdownOption);
+    }
+    final roomMenu = DropdownMenu(
+      label: const Text("Room"),
+      onSelected: (value) {
+        if (value != null) {
+          stop.roomId = value.id;
+        }
+       },
+      dropdownMenuEntries: roomOptions,
+    );
+
+    final binOptions = <DropdownMenuEntry<MailBin>>[];
+    for (final bin in _route!.bins) {
+      final dropdownOption = DropdownMenuEntry(
+        value: bin,
+        label: bin.name,
+      );
+      binOptions.add(dropdownOption);
+    }
+    final binMenu = DropdownMenu(
+      label: const Text("Bin"),
+      onSelected: (value) {
+        if (value != null) {
+          stop.binNumber = value.number;
+        }
+      },
+      dropdownMenuEntries: binOptions,
+    );
+
+    return ListTile(
+      leading: Text("Stop ${index + 1}"),
+      title: Row(
+        children: [
+          roomMenu,
+          binMenu
+        ]
+      )
     );
   }
 }
