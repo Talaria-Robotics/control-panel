@@ -1,4 +1,5 @@
 import 'package:control_panel/routes/plan_route.dart';
+import 'package:control_panel/widgets/talaria_header.dart';
 import 'package:flutter/material.dart';
 
 class FirstRoute extends StatelessWidget {
@@ -11,28 +12,9 @@ class FirstRoute extends StatelessWidget {
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ConstrainedBox(
-                  constraints: const BoxConstraints(
-                      maxHeight: 75
-                  ),
-                  child: Image.asset("assets/images/TalariaLogoSquare.png"),
-                ),
-                Text(
-                  " Talaria",
-                  style: Theme.of(context).textTheme.headlineMedium!
-                      .copyWith(fontWeight: FontWeight.bold, fontSize: 32),
-                ),
-                Text(
-                  " Robotics",
-                  style: Theme.of(context).textTheme.headlineMedium!
-                      .copyWith(fontSize: 32),
-                ),
-              ],
-            ),
+            const TalariaHeader(mainAxisAlignment: MainAxisAlignment.center),
             FilledButton(
               onPressed: () {
                 Navigator.pushReplacement(context,

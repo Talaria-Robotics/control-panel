@@ -1,6 +1,6 @@
 import 'package:control_panel/api/navigator_api.dart';
 import 'package:control_panel/api/navigator_models.dart';
-import 'package:control_panel/strings.dart';
+import 'package:control_panel/widgets/talaria_header.dart';
 import 'package:flutter/material.dart';
 
 class PlanRoute extends StatefulWidget {
@@ -55,6 +55,7 @@ class _PlanRouteState extends State<PlanRoute> {
 
       final stopsView = Table(
         defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+        columnWidths: const {0: IntrinsicColumnWidth()},
         children: stopRows,
       );
 
@@ -72,8 +73,9 @@ class _PlanRouteState extends State<PlanRoute> {
       ];
       
       return Scaffold(
-        appBar: AppBar(
-          title: const Text(TalariaStrings.teamName),
+        appBar: const PreferredSize(
+          preferredSize: Size(double.maxFinite, 50),
+          child: TalariaHeader()
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(8.0),
@@ -95,6 +97,8 @@ class _PlanRouteState extends State<PlanRoute> {
 
   TableRow buildRow(BuildContext context, int index) {
     final stop = _stops[index];
+
+    const menuButtonInsets = EdgeInsets.symmetric(horizontal: 0);
     
     final roomOptions = <DropdownMenuEntry<MailRouteRoom>>[];
     for (final room in _route!.rooms) {
@@ -106,6 +110,8 @@ class _PlanRouteState extends State<PlanRoute> {
     }
     final roomMenu = DropdownMenu(
       label: const Text("Room"),
+      enableSearch: false,
+      expandedInsets: menuButtonInsets,
       onSelected: (value) {
         if (value != null) {
           stop.roomId = value.id;
@@ -124,6 +130,8 @@ class _PlanRouteState extends State<PlanRoute> {
     }
     final binMenu = DropdownMenu(
       label: const Text("Bin"),
+      expandedInsets: menuButtonInsets,
+      enableSearch: false,
       onSelected: (value) {
         if (value != null) {
           stop.binNumber = value.number;
