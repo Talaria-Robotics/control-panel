@@ -15,6 +15,7 @@ class FirstRoute extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const TalariaHeader(mainAxisAlignment: MainAxisAlignment.center),
+            const SizedBox(height: 5),
             FilledButton(
               onPressed: () {
                 Navigator.pushReplacement(context,

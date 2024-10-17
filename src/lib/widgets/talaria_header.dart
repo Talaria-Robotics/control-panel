@@ -11,6 +11,7 @@ class TalariaHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: mainAxisAlignment,
       children: [
         Image.asset("assets/images/TalariaLogoSquare.png",
           fit: BoxFit.fitHeight,
