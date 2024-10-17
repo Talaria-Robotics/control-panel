@@ -16,7 +16,7 @@ class MailRouteStop {
 }
 
 class RequestedMailRoute {
-  late Iterable<MailRouteStop> stops;
+  late Map<int, String> stops;
 }
 
 interface class Identified {

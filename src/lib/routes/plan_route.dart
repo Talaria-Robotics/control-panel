@@ -11,8 +11,9 @@ class PlanRoute extends StatefulWidget {
 }
 
 class _PlanRouteState extends State<PlanRoute> {
+  bool _loading = true;
   PossibleMailRouteInfo? _route;
-  final List<MailRouteStop> _stops = [];
+  final Map<int, String> _stops = {};
 
   @override
   void initState() {
@@ -23,34 +24,37 @@ class _PlanRouteState extends State<PlanRoute> {
   Future<void> loadOptions() async {
     final routeInfo = await NavigatorApi.instance.getPossibleRouteInfo();
     setState(() {
+      _loading = false;
       _route = routeInfo;
     });
   }
 
-  void newRow() {
+  Future<void> next() async {
     setState(() {
-      newStop();
+      _loading = true;
     });
-  }
+    
+    final requestedRoute = RequestedMailRoute()
+      ..stops = _stops;
+    await NavigatorApi.instance.setRoute(requestedRoute);
 
-  void newStop() {
-    final newStop = MailRouteStop()
-      ..binNumber = _route!.bins.first.number
-      ..roomId = _route!.rooms.first.id;
-    _stops.add(newStop);
+    // TODO: Navigate to confirmation screen
+    setState(() {
+      _loading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     late Widget content;
 
-    if (_route == null) {
+    if (_loading) {
       content = const Center(child: CircularProgressIndicator());
     }
     else {
       final stopRows = <TableRow>[];
-      for (var i = 0; i < _stops.length; i++) {
-        stopRows.add(buildRow(context, i));
+      for (final bin in _route!.bins) {
+        stopRows.add(buildRow(context, bin));
       }
 
       final stopsView = Table(
@@ -59,15 +63,10 @@ class _PlanRouteState extends State<PlanRoute> {
         children: stopRows,
       );
 
-      final addRowButton = OutlinedButton(
-        onPressed: newRow,
-        child: const Text("Add Stop")
-      );
-
       final nextButton = [
         const SizedBox(width: 8.0),
         FilledButton(
-          onPressed: () {},
+          onPressed: _stops.isNotEmpty ? next : null,
           child: const Text("Next"),
         )
       ];
@@ -83,11 +82,7 @@ class _PlanRouteState extends State<PlanRoute> {
         ),
         floatingActionButton: Row(
           mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            addRowButton,
-            if (_stops.isNotEmpty)
-              ...nextButton,
-          ],
+          children: nextButton,
         ),
       );
     }
@@ -95,9 +90,7 @@ class _PlanRouteState extends State<PlanRoute> {
     return Material(child: content);
   }
 
-  TableRow buildRow(BuildContext context, int index) {
-    final stop = _stops[index];
-
+  TableRow buildRow(BuildContext context, final MailBin bin) {
     const menuButtonInsets = EdgeInsets.symmetric(horizontal: 0);
     
     final roomOptions = <DropdownMenuEntry<MailRouteRoom>>[];
@@ -114,35 +107,17 @@ class _PlanRouteState extends State<PlanRoute> {
       expandedInsets: menuButtonInsets,
       onSelected: (value) {
         if (value != null) {
-          stop.roomId = value.id;
+          setState(() {
+            _stops[bin.number] = value.id;
+          });
         }
        },
       dropdownMenuEntries: roomOptions,
     );
 
-    final binOptions = <DropdownMenuEntry<MailBin>>[];
-    for (final bin in _route!.bins) {
-      final dropdownOption = DropdownMenuEntry(
-        value: bin,
-        label: bin.name,
-      );
-      binOptions.add(dropdownOption);
-    }
-    final binMenu = DropdownMenu(
-      label: const Text("Bin"),
-      expandedInsets: menuButtonInsets,
-      enableSearch: false,
-      onSelected: (value) {
-        if (value != null) {
-          stop.binNumber = value.number;
-        }
-      },
-      dropdownMenuEntries: binOptions,
-    );
-
     const cellPadding = EdgeInsets.all(8.0);
     return TableRow(
-      decoration: index % 2 == 0 ? BoxDecoration(
+      decoration: bin.number % 2 == 0 ? BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerLow,
         borderRadius: const BorderRadius.all(Radius.circular(4.0))
       ) : null,
@@ -150,7 +125,7 @@ class _PlanRouteState extends State<PlanRoute> {
         Padding(
           padding: cellPadding,
           child: Text(
-            "Stop ${index + 1}",
+            bin.name,
             style: Theme.of(context).textTheme.labelLarge,
           )
         ),
@@ -158,10 +133,6 @@ class _PlanRouteState extends State<PlanRoute> {
           padding: cellPadding,
           child: roomMenu
         ),
-        Padding(
-          padding: cellPadding,
-          child: binMenu
-        )
       ]
     );
   }
