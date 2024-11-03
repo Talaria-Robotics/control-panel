@@ -4,18 +4,14 @@ import 'package:control_panel/api/navigator_api.dart';
 import 'package:control_panel/api/navigator_models.dart';
 
 class MockNavigatorApi implements NavigatorApi {
+  RequestedMailRoute? _requestedRoute;
+
   @override
   Future<PossibleMailRouteInfo> getPossibleRouteInfo() async {
     return await Future.delayed(
       const Duration(seconds: 2),
       _getPossibleRouteInfo,
     );
-  }
-
-  @override
-  Future<void> setRoute(RequestedMailRoute route) {
-    // TODO: implement setRoute
-    throw UnimplementedError();
   }
 
   PossibleMailRouteInfo _getPossibleRouteInfo() {
@@ -47,5 +43,13 @@ class MockNavigatorApi implements NavigatorApi {
           ..id = "00000000-0000-0000-0000-000000000002"
           ..name = "Room B",
       ];
+  }
+
+  @override
+  Future<void> setRoute(RequestedMailRoute route) async {
+    return await Future.delayed(
+      const Duration(seconds: 2),
+      () { _requestedRoute = route; },
+    );
   }
 }
