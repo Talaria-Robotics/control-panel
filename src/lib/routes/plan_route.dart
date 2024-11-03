@@ -93,7 +93,10 @@ class _PlanRouteState extends State<PlanRoute> {
   TableRow buildRow(BuildContext context, final MailBin bin) {
     const menuButtonInsets = EdgeInsets.symmetric(horizontal: 0);
     
-    final roomOptions = <DropdownMenuEntry<MailRouteRoom>>[];
+    final roomOptions = <DropdownMenuEntry<MailRouteRoom?>>[
+      const DropdownMenuEntry<MailRouteRoom?>(value: null, label: " ")
+    ];
+
     for (final room in _route!.rooms) {
       final dropdownOption = DropdownMenuEntry(
         value: room,
@@ -111,16 +114,16 @@ class _PlanRouteState extends State<PlanRoute> {
             _stops[bin.number] = value.id;
           });
         }
+        else {
+          _stops.remove(bin.number);
+        }
        },
+       initialSelection: null,
       dropdownMenuEntries: roomOptions,
     );
 
     const cellPadding = EdgeInsets.all(8.0);
     return TableRow(
-      decoration: bin.number % 2 == 0 ? BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerLow,
-        borderRadius: const BorderRadius.all(Radius.circular(4.0))
-      ) : null,
       children: [
         Padding(
           padding: cellPadding,
