@@ -1,5 +1,6 @@
 import 'package:control_panel/api/navigator_api.dart';
 import 'package:control_panel/api/navigator_models.dart';
+import 'package:control_panel/routes/in_transit_page.dart';
 import 'package:control_panel/widgets/talaria_header.dart';
 import 'package:flutter/material.dart';
 
@@ -58,32 +59,42 @@ class _PlanRouteState extends State<PlanRoute> {
       ..stops = _stops;
     await NavigatorApi.instance.setRoute(requestedRoute);
 
-    // TODO: We've told the navigator what our requested
+    // We've told the navigator what our requested
     // route is. Navigate to the "in-transit" page.
-    // Navigator.push(context,
-    //   MaterialPageRoute(builder: (_) => const PlanRoute()));
+    Navigator.push(context,
+      MaterialPageRoute(builder: (_) => const InTransitPage()));
   }
 
   @override
   Widget build(BuildContext context) {
+    final Widget body;
+    Widget? fab;
+
     if (_status == _PlanRouteStatus.binConfig) {
-      return buildBinConfig(context);
+      (body, fab) = buildBinConfig(context);
     }
     else if (_status == _PlanRouteStatus.confirmation) {
-      return buildConfirmation(context);
+      body = buildConfirmation(context);
     }
     else {
-      return buildLoading(context);
+      body = buildLoading(context);
     }
-  }
 
-  Widget buildLoading(BuildContext context) {
-    return const Material(
-      child: Center(child: CircularProgressIndicator())
+    return Scaffold(
+      appBar: const PreferredSize(
+        preferredSize: Size(double.maxFinite, 50),
+        child: TalariaHeader()
+      ),
+      body: body,
+      floatingActionButton: fab,
     );
   }
 
-  Widget buildBinConfig(BuildContext context) {
+  Widget buildLoading(BuildContext context) {
+    return const Center(child: CircularProgressIndicator());
+  }
+
+  (Widget, Widget) buildBinConfig(BuildContext context) {
     final stopRows = <TableRow>[];
     for (final bin in _route!.bins) {
       stopRows.add(buildRow(context, bin));
@@ -95,27 +106,22 @@ class _PlanRouteState extends State<PlanRoute> {
       children: stopRows,
     );
 
-    final nextButton = [
-      const SizedBox(width: 8.0),
-      FilledButton(
-        onPressed: _stops.isNotEmpty ? next : null,
-        child: const Text("Next"),
-      )
-    ];
-    
-    return Scaffold(
-      appBar: const PreferredSize(
-        preferredSize: Size(double.maxFinite, 50),
-        child: TalariaHeader()
-      ),
-      body: SingleChildScrollView(
+    return (
+      SingleChildScrollView(
         padding: const EdgeInsets.all(8.0),
         child: stopsView
       ),
-      floatingActionButton: Row(
+
+      Row(
         mainAxisAlignment: MainAxisAlignment.end,
-        children: nextButton,
-      ),
+        children: [
+          IconButton.filled(
+            onPressed: _stops.isNotEmpty ? next : null,
+            // child: const Text("Next"),
+            icon: const Icon(Icons.navigate_next)
+          )
+        ],
+      )
     );
   }
 
@@ -202,13 +208,13 @@ class _PlanRouteState extends State<PlanRoute> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                OutlinedButton(
+                IconButton.outlined(
                   onPressed: () {
                     setState(() {
                       _status = _PlanRouteStatus.binConfig;
                     });
                   },
-                  child: const Text("Back")
+                  icon: const Icon(Icons.navigate_before)
                 ),
                 const SizedBox(width: 20),
                 FilledButton(
