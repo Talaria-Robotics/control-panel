@@ -18,33 +18,77 @@ class _InTransitPageState extends State<InTransitPage> {
   void initState() {
     super.initState();
     _stream = NavigatorApi.instance.listenToRoute();
-    _stream.listen(onEvent);
-  }
-
-  void onEvent(MailRouteEvent event) {
-    print(event.orderNumber);
-
-    if (event is InTransitEvent) {
-      print(event.room.name);
-    }
-    else if (event is ArrivedAtStopEvent) {
-      print(event.room.name);
-      print(event.bin.name);
-    }
-
-    setState(() {
-      _recentEvent = event;
+    _stream.listen((event) {
+      setState(() {
+        _recentEvent = event;
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    late Widget body;
+    final MailRouteEvent? event = _recentEvent;
+
+    if (event is ArrivedAtStopEvent) {
+      body = Column(
+        children: [
+          Text(
+            "Howdy\r\n${event.room.name}!",
+            style: Theme.of(context).textTheme.titleMedium
+          ),
+          const SizedBox(height: 20),
+          Text("Your mail is in\r\n${event.bin.name}"),
+          const SizedBox(height: 20),
+          const Text("Tap the button below when you have retrieved all your items."),
+          const SizedBox(height: 10),
+          FilledButton(
+            onPressed: () async {
+              await NavigatorApi.instance.deliveryCompleted();
+            },
+            child: const Text("Done")  
+          )
+        ],
+      );
+    }
+    else if (event is InTransitEvent) {
+      body = Column(
+        children: [
+          const Text("In transit to"),
+          Text(
+            event.room.name,
+            style: Theme.of(context).textTheme.displayMedium
+          ),
+          const SizedBox(height: 20),
+          const CircularProgressIndicator()
+        ],
+      );
+    }
+    else if (event is ReturnToMailroomEvent) {
+      body = Column(
+        children: [
+          const Text("I'm on my way"),
+          Text(
+            "Home",
+            style: Theme.of(context).textTheme.displayMedium
+          ),
+          const SizedBox(height: 20),
+          const CircularProgressIndicator()
+        ],
+      );
+    }
+    else {
+      body = const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     return Scaffold(
       appBar: const PreferredSize(
         preferredSize: Size(double.maxFinite, 50),
         child: TalariaHeader()
       ),
-      body: Text(_recentEvent?.orderNumber.toString() ?? "waiting")
+      body: body
     );
   }
 }
