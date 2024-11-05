@@ -1,3 +1,4 @@
+import 'package:control_panel/api/http_navigator_api.dart';
 import 'package:control_panel/api/mock_navigator_api.dart';
 import 'package:control_panel/api/navigator_api.dart';
 import 'package:control_panel/colors.dart';
@@ -12,7 +13,7 @@ void main() {
 }
 
 void initServices() {
-  NavigatorApi.instance = MockNavigatorApi();
+  NavigatorApi.instance = HttpNavigatorApi(apiUrl: "127.0.0.1:8000");
 }
 
 class MyApp extends StatelessWidget {
