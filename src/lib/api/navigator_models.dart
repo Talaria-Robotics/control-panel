@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class PossibleMailRouteInfo extends Identified {
   late Iterable<MailRouteRoom> rooms;
   late Iterable<MailBin> bins;
@@ -62,6 +64,14 @@ class MailRouteStop {
 
 class RequestedMailRoute {
   late Map<int, String> stops;
+
+  String toJson() {
+    Map<String, String> mailRouteJson = {};
+    for (final stop in stops.entries) {
+      mailRouteJson[stop.key.toString()] = stop.value;
+    }
+    return json.encode(mailRouteJson);
+  }
 }
 
 interface class Identified {

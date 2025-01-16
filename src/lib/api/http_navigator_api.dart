@@ -3,6 +3,7 @@ import 'package:control_panel/api/navigator_api.dart';
 import 'package:control_panel/api/navigator_models.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class HttpNavigatorApi implements NavigatorApi {
   final String apiUrl;
@@ -27,12 +28,25 @@ class HttpNavigatorApi implements NavigatorApi {
 
   @override
   Future<void> setRoute(RequestedMailRoute route) async {
-    throw UnimplementedError();
+    final routeJson = json.encode(route);
+    await http.post(
+      Uri.http(apiUrl, "route"),
+      headers: {"Content-Type": "application/json"},
+      body: routeJson);
   }
 
   @override
-  Stream<MailRouteEvent> listenToRoute() async* {
-    throw UnimplementedError();
+  Stream<MailRouteEvent> listenToRoute() {
+    final transitFeedUri = Uri
+      .http(apiUrl, "transitFeed")
+      .replace(scheme: "ws");
+
+    final _channel = WebSocketChannel.connect(transitFeedUri);
+    return _channel.stream.map((jsonText) {
+      // TODO: Parse event
+      print(jsonText);
+      return MailRouteEvent();
+    });
   }
   
   @override
