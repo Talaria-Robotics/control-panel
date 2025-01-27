@@ -32,21 +32,26 @@ class _InTransitPageState extends State<InTransitPage> {
 
     if (event is ArrivedAtStopEvent) {
       body = Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          const Text("Howdy"),
           Text(
-            "Howdy\r\n${event.room.name}!",
-            style: Theme.of(context).textTheme.titleMedium
+            "${event.room.name}!",
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleLarge
           ),
           const SizedBox(height: 20),
-          Text("Your mail is in\r\n${event.bin.name}"),
+          const Text("Your mail is in"),
+          Text(
+            event.bin.name,
+            style: Theme.of(context).textTheme.titleLarge
+          ),
           const SizedBox(height: 20),
-          const Text("Tap the button below when you have retrieved all your items."),
-          const SizedBox(height: 10),
           FilledButton(
             onPressed: () async {
               await NavigatorApi.instance.deliveryCompleted();
             },
-            child: const Text("Done")  
+            child: const Text("I have received my mail")  
           )
         ],
       );
