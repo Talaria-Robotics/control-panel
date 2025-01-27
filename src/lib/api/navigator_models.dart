@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 class PossibleMailRouteInfo extends Identified {
   late Iterable<MailRouteRoom> rooms;
   late Iterable<MailBin> bins;
@@ -35,6 +33,13 @@ class MailRouteRoom extends Identified {
       _ => throw const FormatException("Failed to read the room"),
     };
   }
+  
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "name": name
+    };
+  }
 }
 
 class MailBin {
@@ -55,6 +60,13 @@ class MailBin {
       _ => throw const FormatException("Failed to parse mail bin"),
     };
   }
+  
+  Map<String, dynamic> toJson() {
+    return {
+      "number": number,
+      "name": name
+    };
+  }
 }
 
 class MailRouteStop {
@@ -65,12 +77,12 @@ class MailRouteStop {
 class RequestedMailRoute {
   late Map<int, String> stops;
 
-  String toJson() {
+  Map<String, dynamic> toJson() {
     Map<String, String> mailRouteJson = {};
     for (final stop in stops.entries) {
       mailRouteJson[stop.key.toString()] = stop.value;
     }
-    return json.encode(mailRouteJson);
+    return mailRouteJson;
   }
 }
 

@@ -1,7 +1,7 @@
 import 'package:control_panel/api/navigator_models.dart';
 
 interface class MailRouteEvent {
-  late int orderNumber;
+  int orderNumber = 0;
 
   MailRouteEvent();
 
@@ -10,12 +10,9 @@ interface class MailRouteEvent {
 
     MailRouteEvent event = switch (type) {
       "ArrivedAtStop" => ArrivedAtStopEvent.fromJson(json),
-
-      "InTransit" => InTransitEvent()
-        ..room = MailRouteRoom.fromJson(json["room"]),
-
+      "InTransit" => InTransitEvent.fromJson(json),
       "ReturnHome" => ReturnHomeEvent(),
-      
+    
       _ => MailRouteEvent()
     };
 
@@ -42,6 +39,15 @@ class ArrivedAtStopEvent extends MailRouteEvent {
       _ => throw const FormatException("Failed to parse stop event"),
     };
   }
+  
+  Map<String, dynamic> toJson() {
+    return {
+      r"$type": "ArrivedAtStop",
+      "orderNumber": orderNumber,
+      "room": room,
+      "bin": bin
+    };
+  }
 }
 
 class InTransitEvent extends MailRouteEvent {
@@ -59,6 +65,27 @@ class InTransitEvent extends MailRouteEvent {
       _ => throw const FormatException("Failed to parse in-transit event"),
     };
   }
+  
+  Map<String, dynamic> toJson() {
+    return {
+      r"$type": "InTransit",
+      "orderNumber": orderNumber,
+      "room": room
+    };
+  }
 }
 
-class ReturnHomeEvent extends MailRouteEvent {}
+class ReturnHomeEvent extends MailRouteEvent {
+  ReturnHomeEvent();
+
+  factory ReturnHomeEvent.fromJson(Map<String, dynamic> json) {
+    return ReturnHomeEvent();
+  }
+  
+  Map<String, dynamic> toJson() {
+    return {
+      r"$type": "ReturnHome",
+      "orderNumber": orderNumber
+    };
+  }
+}
