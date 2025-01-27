@@ -66,6 +66,7 @@ class _InTransitPageState extends State<InTransitPage> {
     }
     else if (event is ReturnHomeEvent) {
       body = Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text("I'm on my way"),
           Text(
@@ -73,7 +74,9 @@ class _InTransitPageState extends State<InTransitPage> {
             style: Theme.of(context).textTheme.displayMedium
           ),
           const SizedBox(height: 20),
-          const CircularProgressIndicator()
+          const SizedBox(
+            width: 200,
+            child: LinearProgressIndicator())
         ],
       );
     }
@@ -88,7 +91,10 @@ class _InTransitPageState extends State<InTransitPage> {
         preferredSize: Size(double.maxFinite, 50),
         child: TalariaHeader()
       ),
-      body: body
+      body: Center(
+        heightFactor: 0.8,
+        child: body,
+      )
     );
   }
 }
