@@ -1,5 +1,4 @@
 import 'package:control_panel/api/http_navigator_api.dart';
-import 'package:control_panel/api/mock_navigator_api.dart';
 import 'package:control_panel/api/navigator_api.dart';
 import 'package:control_panel/colors.dart';
 import 'package:control_panel/routes/first_route.dart';

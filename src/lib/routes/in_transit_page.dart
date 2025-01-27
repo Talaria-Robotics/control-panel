@@ -76,7 +76,8 @@ class _InTransitPageState extends State<InTransitPage> {
           const SizedBox(height: 20),
           const SizedBox(
             width: 200,
-            child: LinearProgressIndicator())
+            child: LinearProgressIndicator()
+          )
         ],
       );
     }
