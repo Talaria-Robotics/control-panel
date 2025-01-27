@@ -88,7 +88,7 @@ class MockNavigatorApi implements NavigatorApi {
       _isConfirmed = false;
     }
 
-    yield ReturnToMailroomEvent()
+    yield ReturnHomeEvent()
       ..orderNumber = currentOrder;
   }
   

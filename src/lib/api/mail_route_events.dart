@@ -14,7 +14,7 @@ interface class MailRouteEvent {
       "InTransit" => InTransitEvent()
         ..room = MailRouteRoom.fromJson(json["room"]),
 
-      "ReturnToMailroom" => ReturnToMailroomEvent(),
+      "ReturnHome" => ReturnHomeEvent(),
       
       _ => MailRouteEvent()
     };
@@ -61,4 +61,4 @@ class InTransitEvent extends MailRouteEvent {
   }
 }
 
-class ReturnToMailroomEvent extends MailRouteEvent {}
+class ReturnHomeEvent extends MailRouteEvent {}

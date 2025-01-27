@@ -43,7 +43,8 @@ class HttpNavigatorApi implements NavigatorApi {
 
     final _channel = WebSocketChannel.connect(transitFeedUri);
     return _channel.stream.map((jsonText) {
-      return MailRouteEvent.fromJson(jsonText);
+      final jsonObj = json.decode(jsonText);
+      return MailRouteEvent.fromJson(jsonObj);
     });
   }
   

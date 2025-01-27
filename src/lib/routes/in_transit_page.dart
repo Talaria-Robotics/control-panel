@@ -64,7 +64,7 @@ class _InTransitPageState extends State<InTransitPage> {
         ],
       );
     }
-    else if (event is ReturnToMailroomEvent) {
+    else if (event is ReturnHomeEvent) {
       body = Column(
         children: [
           const Text("I'm on my way"),
