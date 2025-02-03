@@ -30,6 +30,11 @@ class _InTransitPageState extends State<InTransitPage> {
     late Widget body;
     final MailRouteEvent? event = _recentEvent;
 
+    const Widget progressBar = SizedBox(
+      width: 200,
+      child: LinearProgressIndicator()
+    );
+    
     if (event is ArrivedAtStopEvent) {
       body = Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -58,6 +63,7 @@ class _InTransitPageState extends State<InTransitPage> {
     }
     else if (event is InTransitEvent) {
       body = Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text("In transit to"),
           Text(
@@ -65,7 +71,7 @@ class _InTransitPageState extends State<InTransitPage> {
             style: Theme.of(context).textTheme.displayMedium
           ),
           const SizedBox(height: 20),
-          const CircularProgressIndicator()
+          progressBar
         ],
       );
     }
@@ -79,16 +85,13 @@ class _InTransitPageState extends State<InTransitPage> {
             style: Theme.of(context).textTheme.displayMedium
           ),
           const SizedBox(height: 20),
-          const SizedBox(
-            width: 200,
-            child: LinearProgressIndicator()
-          )
+          progressBar
         ],
       );
     }
     else {
       body = const Center(
-        child: CircularProgressIndicator(),
+        child: progressBar,
       );
     }
 
