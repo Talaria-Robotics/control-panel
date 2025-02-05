@@ -6,7 +6,7 @@ interface class MailRouteEvent {
   MailRouteEvent();
 
   factory MailRouteEvent.fromJson(Map<String, dynamic> json) {
-    final type = json[r"$type"] as String;
+    final type = json["disc"] as String;
 
     MailRouteEvent event = switch (type) {
       "ArrivedAtStop" => ArrivedAtStopEvent.fromJson(json),
@@ -42,7 +42,7 @@ class ArrivedAtStopEvent extends MailRouteEvent {
   
   Map<String, dynamic> toJson() {
     return {
-      r"$type": "ArrivedAtStop",
+      "disc": "ArrivedAtStop",
       "orderNumber": orderNumber,
       "room": room,
       "bin": bin
@@ -68,7 +68,7 @@ class InTransitEvent extends MailRouteEvent {
   
   Map<String, dynamic> toJson() {
     return {
-      r"$type": "InTransit",
+      "disc": "InTransit",
       "orderNumber": orderNumber,
       "room": room
     };
@@ -84,7 +84,7 @@ class ReturnHomeEvent extends MailRouteEvent {
   
   Map<String, dynamic> toJson() {
     return {
-      r"$type": "ReturnHome",
+      "disc": "ReturnHome",
       "orderNumber": orderNumber
     };
   }

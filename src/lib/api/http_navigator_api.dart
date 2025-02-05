@@ -7,6 +7,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 class HttpNavigatorApi implements NavigatorApi {
   final String apiUrl;
+  WebSocketChannel? _channel;
 
   HttpNavigatorApi({required this.apiUrl});
   
@@ -37,12 +38,9 @@ class HttpNavigatorApi implements NavigatorApi {
 
   @override
   Stream<MailRouteEvent> listenToRoute() {
-    final transitFeedUri = Uri
-      .http(apiUrl, "transitFeed")
-      .replace(scheme: "ws");
+    final channel = _connectToTransitFeed();
 
-    final _channel = WebSocketChannel.connect(transitFeedUri);
-    return _channel.stream.map((jsonText) {
+    return channel.stream.map((jsonText) {
       final jsonObj = json.decode(jsonText);
       return MailRouteEvent.fromJson(jsonObj);
     });
@@ -50,6 +48,20 @@ class HttpNavigatorApi implements NavigatorApi {
   
   @override
   Future<void> deliveryCompleted() async {
-    throw UnimplementedError();
+    final channel = _connectToTransitFeed();
+    const data = "acceptDelivery";
+    channel.sink.add(data);
+  }
+
+  WebSocketChannel _connectToTransitFeed() {
+    if (_channel == null) {
+      final transitFeedUri = Uri
+        .http(apiUrl, "transitFeed")
+        .replace(scheme: "ws");
+      
+      _channel = WebSocketChannel.connect(transitFeedUri);
+    }
+
+    return _channel!;
   }
 }
