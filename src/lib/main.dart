@@ -12,7 +12,10 @@ void main() {
 }
 
 void initServices() {
-  NavigatorApi.instance = HttpNavigatorApi(apiUrl: "10.250.246.224:8075");
+  NavigatorApi.instance = HttpNavigatorApi(
+    apiUrl: "10.250.246.224:8075",
+    udpPort: 8076
+  );
 }
 
 class MyApp extends StatelessWidget {

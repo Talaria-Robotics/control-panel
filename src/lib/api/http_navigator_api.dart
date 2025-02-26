@@ -2,17 +2,19 @@ import 'package:control_panel/api/mail_route_events.dart';
 import 'package:control_panel/api/navigator_api.dart';
 import 'package:control_panel/api/navigator_models.dart';
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 class HttpNavigatorApi implements NavigatorApi {
   final String apiUrl;
-  WebSocketChannel? _channel;
+  final int udpPort;
+  RawDatagramSocket? _socket;
 
-  HttpNavigatorApi({required this.apiUrl});
+  HttpNavigatorApi({required this.apiUrl, required this.udpPort});
   
-  HttpNavigatorApi.fromUrl(Uri url)
-    : apiUrl = url.authority;
+  HttpNavigatorApi.fromUrl(Uri url, int port)
+    : apiUrl = url.authority,
+      udpPort = port;
 
   @override
   Future<PossibleMailRouteInfo> getPossibleRouteInfo() async {
@@ -37,31 +39,41 @@ class HttpNavigatorApi implements NavigatorApi {
   }
 
   @override
-  Stream<MailRouteEvent> listenToRoute() {
-    final channel = _connectToTransitFeed();
+  Stream<MailRouteEvent> listenToRoute() async* {
+    final socket = await _connectToTransitFeed();
 
-    return channel.stream.map((jsonText) {
+    await for (var event in socket) {
+      if (event != RawSocketEvent.read) {
+        continue;
+      }
+      
+      // Recieve data from UDP socket
+      final datagram = socket.receive();
+      if (datagram == null) {
+        continue;
+      }
+
+      // Decode into mail route object
+      final jsonText = utf8.decode(datagram.data);
       final jsonObj = json.decode(jsonText);
-      return MailRouteEvent.fromJson(jsonObj);
-    });
+      yield MailRouteEvent.fromJson(jsonObj);
+    }
   }
   
   @override
   Future<void> deliveryCompleted() async {
-    final channel = _connectToTransitFeed();
-    const data = "acceptDelivery";
-    channel.sink.add(data);
+    final socket = await _connectToTransitFeed();
+    
+    // Encode delivery message to UTF-8
+    const text = "acceptDelivery";
+    final textData = utf8.encode(text);
+
+    // Send to Navigator API
+    final address = InternetAddress(apiUrl);
+    socket.send(textData, address, udpPort);
   }
 
-  WebSocketChannel _connectToTransitFeed() {
-    if (_channel == null) {
-      final transitFeedUri = Uri
-        .http(apiUrl, "transitFeed")
-        .replace(scheme: "ws");
-      
-      _channel = WebSocketChannel.connect(transitFeedUri);
-    }
-
-    return _channel!;
+  Future<RawDatagramSocket> _connectToTransitFeed() async {
+    return _socket ??= await RawDatagramSocket.bind(apiUrl, udpPort);
   }
 }
