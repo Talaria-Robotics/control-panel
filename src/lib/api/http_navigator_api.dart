@@ -6,15 +6,18 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class HttpNavigatorApi implements NavigatorApi {
-  final String apiUrl;
+  final String apiAuthority;
+  final int httpPort;
   final int udpPort;
+  final String apiUrl;
   RawDatagramSocket? _socket;
 
-  HttpNavigatorApi({required this.apiUrl, required this.udpPort});
-  
-  HttpNavigatorApi.fromUrl(Uri url, int port)
-    : apiUrl = url.authority,
-      udpPort = port;
+  HttpNavigatorApi({
+    required this.apiAuthority,
+    required this.httpPort,
+    required this.udpPort,
+  })
+  : apiUrl = "$apiAuthority:$httpPort";
 
   @override
   Future<PossibleMailRouteInfo> getPossibleRouteInfo() async {
@@ -69,11 +72,11 @@ class HttpNavigatorApi implements NavigatorApi {
     final textData = utf8.encode(text);
 
     // Send to Navigator API
-    final address = InternetAddress(apiUrl);
+    final address = InternetAddress(apiAuthority);
     socket.send(textData, address, udpPort);
   }
 
   Future<RawDatagramSocket> _connectToTransitFeed() async {
-    return _socket ??= await RawDatagramSocket.bind(apiUrl, udpPort);
+    return _socket ??= await RawDatagramSocket.bind(apiAuthority, udpPort);
   }
 }

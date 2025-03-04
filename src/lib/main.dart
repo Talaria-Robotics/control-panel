@@ -13,7 +13,8 @@ void main() {
 
 void initServices() {
   NavigatorApi.instance = HttpNavigatorApi(
-    apiUrl: "talaria-nav.local:8075",
+    apiAuthority: "talaria-nav.local",
+    httpPort: 8075,
     udpPort: 8076
   );
 }
