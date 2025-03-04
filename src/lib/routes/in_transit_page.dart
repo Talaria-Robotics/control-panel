@@ -20,6 +20,7 @@ class _InTransitPageState extends State<InTransitPage> {
     _stream = NavigatorApi.instance.listenToRoute();
     _stream.listen((event) {
       setState(() {
+        print(event);
         _recentEvent = event;
       });
     });
