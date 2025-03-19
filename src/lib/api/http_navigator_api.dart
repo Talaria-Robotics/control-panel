@@ -44,39 +44,50 @@ class HttpNavigatorApi implements NavigatorApi {
   @override
   Stream<MailRouteEvent> listenToRoute() async* {
     final socket = await _connectToTransitFeed();
+    bool madeReady = false;
 
     await for (var event in socket) {
-      if (event != RawSocketEvent.read) {
-        continue;
-      }
-      
-      // Recieve data from UDP socket
-      final datagram = socket.receive();
-      if (datagram == null) {
-        continue;
-      }
+      switch (event) {
+        case RawSocketEvent.read:
+          // Recieve data from UDP socket
+          final datagram = socket.receive();
+          if (datagram == null) {
+            continue;
+          }
 
-      // Decode into mail route object
-      final jsonText = utf8.decode(datagram.data);
-      final jsonObj = json.decode(jsonText);
-      yield MailRouteEvent.fromJson(jsonObj);
+          // Decode into mail route object
+          final jsonText = utf8.decode(datagram.data);
+          print("Received $jsonText");
+          final jsonObj = json.decode(jsonText);
+          yield MailRouteEvent.fromJson(jsonObj);
+          break;
+
+        case RawSocketEvent.write:
+          if (!madeReady) {
+            madeReady = true;
+            _sendToTransitFeed("ready", socket);
+          }
+          break;
+      }
     }
   }
   
   @override
   Future<void> deliveryCompleted() async {
     final socket = await _connectToTransitFeed();
-    
-    // Encode delivery message to UTF-8
-    const text = "acceptDelivery";
-    final textData = utf8.encode(text);
-
-    // Send to Navigator API
-    final address = InternetAddress(apiAuthority);
-    socket.send(textData, address, udpPort);
+    _sendToTransitFeed("acceptDelivery", socket);
   }
 
   Future<RawDatagramSocket> _connectToTransitFeed() async {
     return _socket ??= await RawDatagramSocket.bind(apiAuthority, udpPort);
+  }
+
+  void _sendToTransitFeed(String text, RawDatagramSocket socket) {
+    // Encode message in UTF-8  
+    final textData = utf8.encode("%$text");
+
+    // Send to Navigator API
+    final address = InternetAddress(apiAuthority);
+    socket.send(textData, address, udpPort);
   }
 }
