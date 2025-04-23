@@ -12,14 +12,9 @@ void main() {
 }
 
 void initServices() {
-  // NavigatorApi.instance = HttpNavigatorApi(
-  //   apiAuthority: "talaria-nav.local",
-  //   httpPort: 8075,
-  //   udpPort: 8076
-  // );
   NavigatorApi.instance = HttpNavigatorApi(
-    apiAuthority: "127.0.0.1",
-    httpPort: 8000,
+    apiAuthority: "talaria-nav.local",
+    httpPort: 8075,
     udpPort: 8076
   );
 }
