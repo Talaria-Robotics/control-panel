@@ -5,10 +5,13 @@ import 'package:control_panel/routes/first_route.dart';
 import 'package:control_panel/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:scaled_app/scaled_app.dart';
 
 void main() {
   initServices();
-  runApp(const MyApp());
+
+  const double constScaleFactor = 1.5;
+  runAppScaled(const MyApp(), scaleFactor: (deviceSize) => constScaleFactor);
 }
 
 void initServices() {
