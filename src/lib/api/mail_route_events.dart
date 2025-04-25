@@ -12,6 +12,7 @@ interface class MailRouteEvent {
       "ArrivedAtStop" => ArrivedAtStopEvent.fromJson(json),
       "InTransit" => InTransitEvent.fromJson(json),
       "ReturnHome" => ReturnHomeEvent(),
+      "Done" => DoneEvent(),
     
       _ => MailRouteEvent()
     };
@@ -92,4 +93,15 @@ class ReturnHomeEvent extends MailRouteEvent {
 
 class DoneEvent extends MailRouteEvent {
   DoneEvent();
+
+  factory DoneEvent.fromJson(Map<String, dynamic> json) {
+    return DoneEvent();
+  }
+  
+  Map<String, dynamic> toJson() {
+    return {
+      "disc": "Done",
+      "orderNumber": orderNumber
+    };
+  }
 }
