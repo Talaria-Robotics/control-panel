@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:control_panel/api/mail_route_events.dart';
 import 'package:control_panel/api/navigator_api.dart';
 import 'package:control_panel/routes/first_route.dart';
@@ -13,13 +15,14 @@ class InTransitPage extends StatefulWidget {
 
 class _InTransitPageState extends State<InTransitPage> {
   late final Stream<MailRouteEvent?> _stream;
+  late final StreamSubscription<MailRouteEvent?> _streamListener;
   MailRouteEvent? _recentEvent;
 
   @override
   void initState() {
     super.initState();
     _stream = NavigatorApi.instance.listenToRoute();
-    _stream.listen((event) {
+    _streamListener = _stream.listen((event) {
       setState(() {
         print(event);
         _recentEvent = event;
@@ -95,7 +98,9 @@ class _InTransitPageState extends State<InTransitPage> {
       body = const Center(
         child: progressBar,
       );
-      
+
+      _streamListener.cancel();
+
       // Reached end of event stream
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (_) => const FirstRoute()));
