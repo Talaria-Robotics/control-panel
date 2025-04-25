@@ -47,34 +47,29 @@ class HttpNavigatorApi implements NavigatorApi {
     bool madeReady = false;
 
     await for (var event in socket) {
-      switch (event) {
-        case RawSocketEvent.read:
-          // Recieve data from UDP socket
-          final datagram = socket.receive();
-          if (datagram == null) {
-            continue;
-          }
-
-          // Decode into mail route object
-          final jsonText = utf8.decode(datagram.data);
-          print("Received $jsonText");
-          final jsonObj = json.decode(jsonText);
-          yield MailRouteEvent.fromJson(jsonObj);
-          break;
-
-        case RawSocketEvent.write:
-          if (!madeReady) {
-            madeReady = true;
-            _sendToTransitFeed("ready", socket);
-          }
-          break;
-
-        case RawSocketEvent.closed:
-        case RawSocketEvent.readClosed:
-          yield DoneEvent();
-          return;
+      if (event == RawSocketEvent.read) {
+        final datagram = socket.receive();
+        if (datagram == null) {
+          continue;
+        }
+        
+        // Decode into mail route object
+        final jsonText = utf8.decode(datagram.data);
+        print("Received $jsonText");
+        final jsonObj = json.decode(jsonText);
+        yield MailRouteEvent.fromJson(jsonObj);
+      } else if (event == RawSocketEvent.write) {
+        if (!madeReady) {
+          madeReady = true;
+          _sendToTransitFeed("ready", socket);
+        }
+      } else if (event == RawSocketEvent.closed || event == RawSocketEvent.readClosed) {
+        yield DoneEvent();
+        break;
       }
     }
+    
+    _disconnectFromTransitFeed();
   }
   
   @override
@@ -85,6 +80,11 @@ class HttpNavigatorApi implements NavigatorApi {
 
   Future<RawDatagramSocket> _connectToTransitFeed() async {
     return _socket ??= await RawDatagramSocket.bind(InternetAddress.anyIPv4, udpPort);
+  }
+
+  void _disconnectFromTransitFeed() {
+    _socket?.close();
+    _socket = null;
   }
 
   Future<void> _sendToTransitFeed(String text, RawDatagramSocket socket) async {
