@@ -32,7 +32,7 @@ class _InTransitPageState extends State<InTransitPage> {
 
   @override
   Widget build(BuildContext context) {
-    late Widget body;
+    Widget? body;
     final MailRouteEvent? event = _recentEvent;
 
     const Widget progressBar = SizedBox(
@@ -95,10 +95,6 @@ class _InTransitPageState extends State<InTransitPage> {
       );
     }
     else if (event is DoneEvent) {
-      body = const Center(
-        child: progressBar,
-      );
-
       _streamListener.cancel();
 
       // Reached end of event stream
@@ -111,15 +107,19 @@ class _InTransitPageState extends State<InTransitPage> {
       );
     }
 
-    return Scaffold(
-      appBar: const PreferredSize(
-        preferredSize: Size(double.maxFinite, 50),
-        child: TalariaHeader()
-      ),
-      body: Center(
-        heightFactor: 0.8,
-        child: body,
-      )
-    );
+    if (body != null) {
+      return Scaffold(
+        appBar: const PreferredSize(
+          preferredSize: Size(double.maxFinite, 50),
+          child: TalariaHeader()
+        ),
+        body: Center(
+          heightFactor: 0.8,
+          child: body,
+        )
+      );
+    }
+
+    return const Center();
   }
 }
