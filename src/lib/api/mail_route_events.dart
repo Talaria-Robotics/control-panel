@@ -89,3 +89,7 @@ class ReturnHomeEvent extends MailRouteEvent {
     };
   }
 }
+
+class DoneEvent extends MailRouteEvent {
+  DoneEvent();
+}

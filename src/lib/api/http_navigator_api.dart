@@ -68,6 +68,11 @@ class HttpNavigatorApi implements NavigatorApi {
             _sendToTransitFeed("ready", socket);
           }
           break;
+
+        case RawSocketEvent.closed:
+        case RawSocketEvent.readClosed:
+          yield DoneEvent();
+          return;
       }
     }
   }

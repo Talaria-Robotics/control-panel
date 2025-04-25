@@ -1,5 +1,6 @@
 import 'package:control_panel/api/mail_route_events.dart';
 import 'package:control_panel/api/navigator_api.dart';
+import 'package:control_panel/routes/first_route.dart';
 import 'package:control_panel/widgets/talaria_header.dart';
 import 'package:flutter/material.dart';
 
@@ -11,7 +12,7 @@ class InTransitPage extends StatefulWidget {
 }
 
 class _InTransitPageState extends State<InTransitPage> {
-  late final Stream<MailRouteEvent> _stream;
+  late final Stream<MailRouteEvent?> _stream;
   MailRouteEvent? _recentEvent;
 
   @override
@@ -80,7 +81,7 @@ class _InTransitPageState extends State<InTransitPage> {
       body = Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text("I'm on my way"),
+          const Text("Returning"),
           Text(
             "Home",
             style: Theme.of(context).textTheme.displayMedium
@@ -89,6 +90,11 @@ class _InTransitPageState extends State<InTransitPage> {
           progressBar
         ],
       );
+    }
+    else if (event is DoneEvent) {
+      // Reached end of event stream
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (_) => const FirstRoute()));
     }
     else {
       body = const Center(

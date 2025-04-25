@@ -90,6 +90,9 @@ class MockNavigatorApi implements NavigatorApi {
 
     yield ReturnHomeEvent()
       ..orderNumber = currentOrder;
+
+    await Future.delayed(const Duration(seconds: 20));
+    yield DoneEvent();
   }
   
   @override
