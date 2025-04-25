@@ -10,7 +10,7 @@ import 'package:scaled_app/scaled_app.dart';
 void main() {
   initServices();
 
-  const double constScaleFactor = 1.5;
+  const double constScaleFactor = 1.75;
   runAppScaled(const MyApp(), scaleFactor: (deviceSize) => constScaleFactor);
 }
 

@@ -79,7 +79,7 @@ class HttpNavigatorApi implements NavigatorApi {
   }
 
   Future<RawDatagramSocket> _connectToTransitFeed() async {
-    return _socket ??= await RawDatagramSocket.bind("127.0.0.1", udpPort);
+    return _socket ??= await RawDatagramSocket.bind(InternetAddress.anyIPv4, udpPort);
   }
 
   Future<void> _sendToTransitFeed(String text, RawDatagramSocket socket) async {
