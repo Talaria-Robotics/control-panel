@@ -92,6 +92,10 @@ class _InTransitPageState extends State<InTransitPage> {
       );
     }
     else if (event is DoneEvent) {
+      body = const Center(
+        child: progressBar,
+      );
+      
       // Reached end of event stream
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (_) => const FirstRoute()));
