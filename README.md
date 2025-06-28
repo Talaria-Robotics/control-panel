@@ -1,3 +1,4 @@
-# control-panel
+# Control Panel
+The software that runs on the secondary Pi for user interaction.
 
-touchscreen
+[Read the Docs](https://github.com/Talaria-Robotics/docs/tree/main/software)
